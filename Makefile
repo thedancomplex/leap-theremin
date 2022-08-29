@@ -15,14 +15,12 @@ else
 endif
 
 CXX=g++
-CLIBS=-lstk -lpthread -ljack -lrt --std=c++17
+CLIBS=-lstk -lpthread -ljack -lrt -lasound -lrtaudio --std=c++11
 CFLAGS=-Wall -D__UNIX_JACK__ -D__LITTLE_ENDIAN__ 
 
+
 $(SYS_NAME): src/$(SYS_NAME).cpp
-	$(CXX) $(CFLAGS) -g -Iinclude/  src/$(SYS_NAME).cpp -o $(SYS_NAME) $(LEAP_LIBRARY) $(CLIBS)
-ifeq ($(OS), Darwin)
-	install_name_tool -change @loader_path/libLeap.dylib ~/LeapSDK/lib/libLeap.dylib Sample
-endif
+	$(CXX) $(CFLAGS) -g -I/usr/include/stk -Iinclude  src/$(SYS_NAME).cpp -o $(SYS_NAME) $(LEAP_LIBRARY) $(CLIBS)
 
 clean:
-	rm -rf $(SYS_NAME) $(SYS_NAME).dSYM
+	rm -rf $(SYS_NAME)

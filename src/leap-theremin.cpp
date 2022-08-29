@@ -7,8 +7,15 @@
 #include <cstdlib>
 
 
+#define BASE_FREQUENCY 440.0
+//SineWave sine;
+//RtWvOut dac;
+#include "audio-ctrl.h"
+
 using namespace stk;
 using namespace Leap;
+
+
 
 class SampleListener : public Listener {
   public:
@@ -77,6 +84,11 @@ void SampleListener::onFrame(const Controller& controller) {
     const Vector normal = hand.palmNormal();
     const Vector direction = hand.direction();
 
+    double f_ratio = hand.palmPosition()[1] / 100.0;
+    double f_out = f_ratio * BASE_FREQUENCY;
+    std::cout << "Frequency = " << f_out << std::endl;
+    sine.setFrequency( f_out );
+
     // Calculate the hand's pitch, roll, and yaw angles
     std::cout << std::string(2, ' ') 
 	      <<  "pitch: " << direction.pitch() * RAD_TO_DEG << " degrees, "
@@ -112,13 +124,36 @@ void SampleListener::onServiceDisconnect(const Controller& controller) {
   std::cout << "Service Disconnected" << std::endl;
 }
 
+
+int setupAudio()
+{
+  Stk::setSampleRate( 44100.0);
+  Stk::showWarnings( true );
+  try {
+	  // open one channel for playback in rt
+	  //dac = new RtWvOut(1, 44100.0, 2);
+	  
+  }
+  catch ( StkError & )
+  {
+	  return 1;
+  }
+
+  return 0;
+}
+
 int main(int argc, char** argv) {
   // Create a sample listener and controller
   SampleListener listener;
   Controller controller;
 
+
+  /* set up audio */
+  if (setupAudio2() ) exit(1);
+
   // Have the sample listener receive events from the controller
   controller.addListener(listener);
+
 
   if (argc > 1 && strcmp(argv[1], "--bg") == 0)
     controller.setPolicy(Leap::Controller::POLICY_BACKGROUND_FRAMES);
