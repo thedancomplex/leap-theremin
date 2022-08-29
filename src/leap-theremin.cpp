@@ -125,23 +125,6 @@ void SampleListener::onServiceDisconnect(const Controller& controller) {
 }
 
 
-int setupAudio()
-{
-  Stk::setSampleRate( 44100.0);
-  Stk::showWarnings( true );
-  try {
-	  // open one channel for playback in rt
-	  //dac = new RtWvOut(1, 44100.0, 2);
-	  
-  }
-  catch ( StkError & )
-  {
-	  return 1;
-  }
-
-  return 0;
-}
-
 int main(int argc, char** argv) {
   // Create a sample listener and controller
   SampleListener listener;
@@ -149,7 +132,7 @@ int main(int argc, char** argv) {
 
 
   /* set up audio */
-  if (setupAudio2() ) exit(1);
+  if (setupAudio() ) exit(1);
 
   // Have the sample listener receive events from the controller
   controller.addListener(listener);
