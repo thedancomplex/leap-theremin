@@ -88,6 +88,8 @@ void SampleListener::onFrame(const Controller& controller) {
     double f_out = f_ratio * BASE_FREQUENCY;
     std::cout << "Frequency = " << f_out << std::endl;
     sine.setFrequency( f_out );
+    sine2.setFrequency( f_out+1 );
+    saw.setFrequency( f_out );
 
     // Calculate the hand's pitch, roll, and yaw angles
     std::cout << std::string(2, ' ') 

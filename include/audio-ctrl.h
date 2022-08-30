@@ -7,28 +7,27 @@
 using namespace stk;
 
 SineWave sine;
+double k_sine  = 0.25;
+
+SineWave sine2;
+double k_sine2 = 0.25;
+
 BlitSaw saw;
+double k_saw   = 0.1;
+
 RtAudio dac;
 // This tick() function handles sample computation only.  It will be
 // called automatically when the system needs a new buffer of audio
 // samples.
-int tickSine( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
          double streamTime, RtAudioStreamStatus status, void *dataPointer )
 {
-  SineWave *sine = (SineWave *) dataPointer;
   register StkFloat *samples = (StkFloat *) outputBuffer;
   for ( unsigned int i=0; i<nBufferFrames; i++ )
-    *samples++ = sine->tick();
-  return 0;
-}
-
-int tickSaw( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
-         double streamTime, RtAudioStreamStatus status, void *dataPointer )
-{
-  BlitSaw *saw = (BlitSaw *) dataPointer;
-  register StkFloat *samples = (StkFloat *) outputBuffer;
-  for ( unsigned int i=0; i<nBufferFrames; i++ )
-    *samples++ = saw->tick();
+    *samples++ = sine.tick()  * k_sine 
+	       + sine2.tick() * k_sine2
+	       + saw.tick()   * k_saw
+	       ;
   return 0;
 }
 
@@ -48,14 +47,16 @@ int setupAudio()
   RtAudioFormat format = ( sizeof(StkFloat) == 8 ) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
   unsigned int bufferFrames = RT_BUFFER_SIZE;
   try {
-    dac.openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tickSine, (void *)&sine );
-    dac.openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tickSaw, (void *)&saw );
+    dac.openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)&sine );
+//    dac.openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tickSaw, (void *)&saw );
   }
   catch ( RtAudioError &error ) {
     error.printMessage();
     return 1;
   }
   sine.setFrequency(440.0);
+  sine2.setFrequency(441.0);
+  saw.setFrequency(440.0);
   try {
     dac.startStream();
   }
@@ -79,5 +80,7 @@ int setupAudio()
  cleanup:
   return 0;
   */
+
+  return 0;
 }
 
